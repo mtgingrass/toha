@@ -36,7 +36,7 @@
 
     <!--- ADD HOME SECTION ---------------->
     {{- partial "sections/home.html" . -}}
-
+ 
     <!--- ADD OPTIONAL SECTIONS ----------->
     {{ $sections:= site.Data.sections }}
     {{ if (index site.Data site.Language.Lang).sections }}
