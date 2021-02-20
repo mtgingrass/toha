@@ -5,7 +5,7 @@
 {{ if site.Params.logo.favicon }}
   {{ $favicon = site.Params.logo.favicon }}
 {{ end }}
-BLAH TEST BLAH BLAH TEST
+
 {{/* resize the favicon. don't resize svg because it is not supported */}}
 {{ $favicon := resources.Get $favicon }}
 {{ if and $favicon (ne $favicon.MediaType.SubType "svg") }}
