@@ -1,79 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>{{- .Site.Title -}}</title>
-    {{ $siteDescription := .Site.Params.description }}
-    {{ if (index .Site.Data .Site.Language.Lang).site }}
-      {{ $siteConfig := (index .Site.Data .Site.Language.Lang).site }}
-      {{ if $siteConfig.description }}
-        {{ $siteDescription = $siteConfig.description }}
+{{ define "header" }}
+    <link rel="stylesheet" href="{{ "/css/layouts/list.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "/css/navigators/sidebar.css" | relURL}}">
+{{ end }}
+
+{{ define "navbar" }}
+    {{ partial "navigators/navbar-2.html" . }}
+{{ end }}
+
+{{ define "sidebar" }}
+  {{ $blogHome:="#" }}
+  {{ if site.IsMultiLingual }}
+    {{ $blogHome = (path.Join (cond ( eq .Language.Lang "en") "" .Language.Lang) .Type) }}
+  {{ end }}
+
+  <section class="sidebar-section" id="sidebar-section">
+    <div class="sidebar-holder">
+      <div class="sidebar" id="sidebar">
+        <input type="text" value="" placeholder="Search" data-search="" id="search-box" />
+        <div class="sidebar-tree">
+          <ul class="tree" id="tree">
+            <li id="list-heading"><a href="{{ .Type | relLangURL }}" data-filter="all">{{ i18n .Type }}</a></li>
+            <div class="subtree">
+                {{ partial "navigators/sidebar.html" (dict "menus" site.Menus.sidebar "ctx" .) }}
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+{{ end }}
+
+{{ define "content" }}
+<section class="content-section" id="content-section">
+  <div class="content container-fluid" id="content">
+    <div class="container-fluid post-card-holder" id="post-card-holder">
+      {{ $paginator := .Paginate .RegularPagesRecursive 12 }}
+      {{ range $paginator.Pages }}
+        {{ partial "cards/post.html" . }}
       {{ end }}
-    {{ end }}
-    <meta name="description" content="{{ $siteDescription }}" />
-    
-    <!-- import common headers -->
-    {{- partial "header.html" . -}}
+    </div>
+    <div class="paginator">
+      {{ template "_internal/pagination.html" . }}
+    </div>
+  </div>
+</section>
+{{ end }}
 
-    <!-- import index page specific headers -->
-    <link rel="stylesheet" href="{{ "/css/sections/home.css" | relURL }}"/>
-    <link rel="stylesheet" href="{{ "/css/sections/about.css" | relURL }}"/>
-    <link rel="stylesheet" href="{{ "/css/sections/skills.css" | relURL }}"/>
-    <link rel="stylesheet" href="{{ "/css/sections/experiences.css" | relURL }}"/>
-    <link rel="stylesheet" href="{{ "/css/sections/education.css" | relURL }}"/>
-    <link rel="stylesheet" href="{{ "/css/sections/projects.css" | relURL }}"/>
-    <link rel="stylesheet" href="{{ "/css/sections/recent-posts.css" | relURL }}"/>
-    <link rel="stylesheet" href="{{ "/css/sections/achievements.css" | relURL }}"/>
-
-    <!-- Add Google Analytics if enabled in configuration -->
-    {{ if site.GoogleAnalytics }}
-        {{ template "_internal/google_analytics_async.html" . }}
-    {{ end }}
-  </head>
-  <body data-spy="scroll" data-target="#top-navbar" data-offset="100">
-
-    <!--- NAVBAR ------------------------->
-    {{- partial "navigators/navbar.html" . -}}
-  
-    <!--- ADD HOME SECTION ---------------->
-    {{- partial "sections/home.html" . -}}
-
-    <!--- ADD OPTIONAL SECTIONS ----------->
-    {{ $sections:= site.Data.sections }}
-    {{ if (index site.Data site.Language.Lang).sections }}
-      {{ $sections = (index site.Data site.Language.Lang).sections }}
-    {{ end }}
-
-    {{ if $sections }}
-      {{ $background:= "bg-white"}}
-      {{ range sort $sections "section.weight" }}
-        {{ if .section.enable }}
-          <div class="container-fluid section-holder d-flex {{ $background }}">
-            {{ if .section.template }}
-              {{- partial .section.template . -}}
-            {{ else }}
-              {{- partial (printf "sections/%s.html" (replace (lower .section.id) " " "-")) . -}}
-            {{ end }}
-          </div>
-          <!--- alter background color for next section --->
-          {{ if eq $background "bg-white" }}
-            {{ $background = "bg-dimmed" }}
-          {{ else }}
-            {{ $background = "bg-white" }}
-          {{end}}
-        {{ end }}
-      {{ end }}
-    {{ end }}
-
-    <!--- ADD FOOTER ----------------------->
-    {{- partial "footer.html" . -}}
-
-    <!--- ADD COMMON SCRIPTS --------------->
-    {{ partial "scripts.html" . }}
-
-    <!--- ADD INDEX PAGE SPECIFIC SCRIPTS -->
-    <script src="{{ "/js/itype.min.js" | relURL }}"></script>
-    <script src="{{ "/js/github-button.js" | relURL }}"></script>
-    <script src="{{ "/js/home.js" | relURL }}"></script>
-    <script src="{{ "/js/jquery.filterizr.min.js" | relURL }}"></script>
-  </body>
-</html>
+{{ define "scripts" }}
+    <script src="{{ "/js/list.js" | relURL }}"></script>
+{{ end }}
